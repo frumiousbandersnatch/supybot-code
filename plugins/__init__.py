@@ -340,6 +340,7 @@ class ChannelIdDatabasePlugin(callbacks.Plugin):
         self.__parent = super(ChannelIdDatabasePlugin, self)
         self.__parent.__init__(irc)
         self.db = DB(self.name(), {'flat': self.DB})()
+        self.capstr = ['op']
 
     def die(self):
         self.db.close()
@@ -360,9 +361,10 @@ class ChannelIdDatabasePlugin(callbacks.Plugin):
     def checkChangeAllowed(self, irc, msg, channel, user, record):
         if user.id == record.by:
             return True
-        cap = ircdb.makeChannelCapability(channel, 'op')
-        if ircdb.checkCapability(msg.prefix, cap):
-            return True
+        for capstr in self.capstr:
+            cap = ircdb.makeChannelCapability(channel, capstr)
+            if ircdb.checkCapability(msg.prefix, cap):
+                return True
         irc.errorNoCapability(cap)
 
     def addValidator(self, irc, text):
