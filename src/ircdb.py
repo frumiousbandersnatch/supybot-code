@@ -195,7 +195,8 @@ class UserCapabilitySet(CapabilitySet):
 class IrcUser(object):
     """This class holds the capabilities and authentications for a user."""
     def __init__(self, ignore=False, password='', name='',
-                 capabilities=(), hostmasks=None, secure=False, hashed=False):
+                 capabilities=(), hostmasks=None, secure=False, hashed=False,
+                 associations=()):
         self.id = None
         self.auth = [] # The (time, hostmask) list of auth crap.
         self.name = name # The name of the user.
@@ -210,10 +211,13 @@ class IrcUser(object):
             self.hostmasks = ircutils.IrcSet() # hostmasks used for recognition
         else:
             self.hostmasks = hostmasks
+        self.associations = set(associations)
+        
 
     def __repr__(self):
         return format('%s(id=%s, ignore=%s, password="", name=%q, hashed=%r, '
-                      'capabilities=%r, hostmasks=[], secure=%r)\n',
+                      'capabilities=%r, hostmasks=[], secure=%r, '
+                      'associations=[])\n',
                       self.__class__.__name__, self.id, self.ignore,
                       self.name, self.hashed, self.capabilities, self.secure)
 
@@ -290,6 +294,17 @@ class IrcUser(object):
         """Removes a hostmask from the user's hostmasks."""
         self.hostmasks.remove(hostmask)
 
+    def addAssociation(self, assoc):
+        """Add the association from the user's associations"""
+        self.associations.add(assoc)
+
+    def removeAssociation(self, assoc):
+        """Remove the association from the user's associations"""
+        try:
+            self.associations.remove(assoc)
+        except KeyError:
+            pass
+
     def addAuth(self, hostmask):
         """Sets a user's authenticated hostmask.  This times out in 1 hour."""
         if self.checkHostmask(hostmask, useAuth=False) or not self.secure:
@@ -317,6 +332,8 @@ class IrcUser(object):
             write('capability %s' % capability)
         for hostmask in self.hostmasks:
             write('hostmask %s' % hostmask)
+        for assoc in self.associations:
+            write('association %s' % assoc)
         fd.write(os.linesep)
 
 
@@ -485,6 +502,10 @@ class IrcUserCreator(Creator):
     def hostmask(self, rest, lineno):
         self._checkId()
         self.u.hostmasks.add(rest)
+
+    def association(self, rest, lineno):
+        self._checkId()
+        self.u.associations.add(rest)
 
     def capability(self, rest, lineno):
         self._checkId()

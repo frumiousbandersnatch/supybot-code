@@ -80,6 +80,60 @@ class User(callbacks.Plugin):
     list = wrap(list, [getopts({'capability':'capability'}),
                        additional('glob')])
 
+    def associate(self, irc, msg, args, name, domain):
+        """<name> <domain>
+
+        Associate the <name> in some <domain> with your current
+        hostmask.  You must be regsisterd (see 'register' command).
+        """
+        try:
+            user = ircdb.users.getUser(msg.prefix)
+        except KeyError:
+            irc.reply('Please register first. (do "help register")')
+            return
+
+        assoc = '%s|%s' % (name,domain)
+        user.addAssociation(assoc)
+        irc.reply('I associated you with "%s@%s"' % (name,domain))
+        return
+    associate = wrap(associate, ['something', 'something'])
+
+    def disassociate(self, irc, msg, args, name, domain):
+        """<name> <domain>
+
+        Disassociate the <name> in some <domain> from your current
+        hostmask.  You must be regsisterd (see 'register' command).
+        """
+        try:
+            user = ircdb.users.getUser(msg.prefix)
+        except KeyError:
+            irc.reply('Please register first. (do "help register")')
+            return
+
+        assoc = '%s|%s' % (name,domain)
+        user.removeAssociation(assoc)
+        irc.reply('I have disassociated you with "%s@%s"' % (name,domain))
+        return
+    disassociate = wrap(disassociate, ['something', 'something'])
+
+    def associations(self, irc, msg, args, user):
+        """[<name>]
+
+        List your associations or those for the given name.
+        """
+        if not user:
+            try:
+                user = ircdb.users.getUser(msg.prefix)
+            except KeyError:
+                irc.errorNotRegistered(Raise=True)
+
+        assocs = [s.replace('|','@') for s in sorted(user.associations)]
+        assocs = ', '.join(assocs)
+        irc.reply('%s associations: %s' % (user.name, assocs or "(none)"))
+        return
+    associations = wrap(associations, [optional('otherUser')])
+
+
     def register(self, irc, msg, args, name, password):
         """<name> <password>
 

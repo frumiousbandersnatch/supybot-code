@@ -53,6 +53,7 @@ class Anonymous(callbacks.Plugin):
             except KeyError:
                 irc.errorNotRegistered(Raise=True)
         capability = self.registryValue('requireCapability')
+
         if capability:
             if not ircdb.checkCapability(msg.prefix, capability):
                 irc.errorNoCapability(capability, Raise=True)
