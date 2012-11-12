@@ -39,7 +39,7 @@ import supybot.callbacks as callbacks
 
 
 class Games(callbacks.Plugin):
-    def coin(self, irc, msg, args):
+    def flip(self, irc, msg, args):
         """takes no arguments
 
         Flips a coin and returns the result.
@@ -48,9 +48,9 @@ class Games(callbacks.Plugin):
             irc.reply('heads')
         else:
             irc.reply('tails')
-    coin = wrap(coin)
+    flip = wrap(flip)
 
-    def dice(self, irc, msg, args, m):
+    def roll(self, irc, msg, args, m):
         """<dice>d<sides>
 
         Rolls a die with <sides> number of sides <dice> times.
@@ -70,7 +70,7 @@ class Games(callbacks.Plugin):
                 L[i] = random.randrange(1, sides+1)
             irc.reply(format('%L', [str(x) for x in L]))
     _dicere = re.compile(r'^(\d+)d(\d+)$')
-    dice = wrap(dice, [('matches', _dicere,
+    roll = wrap(roll, [('matches', _dicere,
                         'Dice must be of the form <dice>d<sides>')])
 
     # The list of words and algorithm are pulled straight the mozbot
