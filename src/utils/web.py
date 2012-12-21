@@ -98,11 +98,13 @@ defaultHeaders = {
 # application-specific function.  Feel free to use a callable here.
 proxy = None
 
-def getUrlFd(url, headers=None, data=None, timeout=None):
+def getUrlFd(url, headers=None, data=None, timeout=None, follow=False):
     """getUrlFd(url, headers=None, data=None)
 
     Opens the given url and returns a file object.  Headers and data are
-    a dict and string, respectively, as per urllib2.Request's arguments."""
+    a dict and string, respectively, as per urllib2.Request's arguments.  
+    If <follow> is True then follow redirects."""
+
     if headers is None:
         headers = defaultHeaders
     try:

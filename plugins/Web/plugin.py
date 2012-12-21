@@ -76,7 +76,14 @@ class Web(callbacks.PluginRegexp):
             irc.reply(str(e))
 
     def titleSnarfer(self, irc, msg, match):
+
         channel = msg.args[0]
+
+        ign = self.registryValue('ignoredNicks', channel)
+        print 'ignoredNicks in titleSnarfer:',ign
+        if irc.nick in ign: 
+            return
+
         if not irc.isChannel(channel):
             return
         if callbacks.addressed(irc.nick, msg):
