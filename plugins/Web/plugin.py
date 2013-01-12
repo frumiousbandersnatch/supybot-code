@@ -79,15 +79,17 @@ class Web(callbacks.PluginRegexp):
 
         channel = msg.args[0]
 
-        ign = self.registryValue('ignoredNicks', channel)
-        print 'ignoredNicks in titleSnarfer:',ign
-        if irc.nick in ign: 
-            return
-
         if not irc.isChannel(channel):
             return
         if callbacks.addressed(irc.nick, msg):
             return
+        ign = self.registryValue('ignoredNicks', channel)
+        print 'nick=%s ignoredNicks in titleSnarfer %s, match=%s' % \
+            (msg.nick, ign, match.group(0))
+        if msg.nick in ign: 
+            return
+
+
         if self.registryValue('titleSnarfer', channel):
             url = match.group(0)
             r = self.registryValue('nonSnarfingRegexp', channel)

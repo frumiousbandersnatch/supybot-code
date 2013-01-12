@@ -48,6 +48,8 @@ class Google(callbacks.PluginRegexp):
     callBefore = ['Web']
     regexps = ['googleSnarfer']
 
+    _short_urls = {}
+
     _colorGoogles = {}
     def _getColorGoogle(self, m):
         s = m.group(1)
@@ -118,26 +120,57 @@ class Google(callbacks.PluginRegexp):
             raise callbacks.Error, 'We broke The Google!'
         return resp
 
+
+    def shortenUrl(self, url):
+        surl = self._short_urls.get(url)
+        if surl:
+            return surl
+        
+        isgd_url = 'http://is.gd/create.php?format=simple&url=%s'
+        surl = utils.web.getUrlFd(isgd_url % url).read()
+        if not surl:
+            return url
+
+        print 'URL: "%s" --> "%s"' % (url, surl)
+
+        self._short_urls[url] = surl
+        return surl
+
+    def _mungeUrl(self, url):
+        if self.registryValue('shortenLinks'):
+            url = self.shortenUrl(url)
+        
+        linkColor = self.registryValue('linkColor', 'green')
+        if linkColor:
+            url = ircutils.mircColor(url, linkColor)
+
+        return url
+
     def formatData(self, data, bold=True, max=0):
         if isinstance(data, basestring):
             return data
         results = []
         if max:
             data = data[:max]
+
         for result in data:
             title = utils.web.htmlToText(result['titleNoFormatting']\
                                          .encode('utf-8'))
             url = result['unescapedUrl'].encode('utf-8')
+
+            url = self._mungeUrl(url)
             if title:
                 if bold:
                     title = ircutils.bold(title)
-                results.append(format('%s: %u', title, url))
+                results.append(format('%s: %s', title, url))
             else:
                 results.append(url)
         if not results:
             return format('No matches found.')
-        else:
-            return format('; '.join(results))
+
+        ret = ' - '.join(results)
+        ret = format(ret)
+        return ret
 
     def lucky(self, irc, msg, args, text):
         """<search>

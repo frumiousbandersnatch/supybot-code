@@ -108,6 +108,10 @@ conf.registerChannelValue(Google, 'colorfulFilter',
     bot's output will be made colorful (like Google's logo)."""))
 conf.registerChannelValue(Google, 'bold',
     registry.Boolean(True, """Determines whether results are bolded."""))
+conf.registerChannelValue(Google, 'shortenLinks',
+    registry.Boolean(True, """Determine if links should be shortened."""))
+conf.registerChannelValue(Google, 'linkColor',
+    registry.String('green', """What color to show as links."""))
 conf.registerChannelValue(Google, 'maximumResults',
     NumSearchResults(8, """Determines the maximum number of results returned
     from the google command."""))
