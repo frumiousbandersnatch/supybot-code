@@ -629,7 +629,7 @@ class Filter(callbacks.Plugin):
         """
         text = text.translate(self._azn_trans)
         irc.reply(text)
-    azn = wrap(azn, ['text'])
+    #azn = wrap(azn, ['text'])
 
     # TODO: 2,4,;
     # XXX suckiest: B,K,P,Q,T
