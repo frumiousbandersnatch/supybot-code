@@ -127,7 +127,11 @@ class Google(callbacks.PluginRegexp):
             return surl
         
         isgd_url = 'http://is.gd/create.php?format=simple&url=%s'
-        surl = utils.web.getUrlFd(isgd_url % url).read()
+        try:
+            surl = utils.web.getUrlFd(isgd_url % url).read()
+        except utils.web.Error:
+            return url
+
         if not surl:
             return url
 
